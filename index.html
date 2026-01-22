@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Metadata Viewer</title>
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/themes.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-images"></i>
+                    <h1>Image Metadata Viewer</h1>
+                </div>
+                <div class="header-controls">
+                    <button id="themeToggle" class="btn-icon" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="settingsBtn" class="btn-icon" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button id="helpBtn" class="btn-icon" title="Help">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Upload Image</h3>
+                    <div id="dropZone" class="drop-zone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & Drop or Click to Upload</p>
+                        <input type="file" id="fileInput" accept="image/*" multiple hidden>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Image Gallery</h3>
+                    <div id="imageList" class="image-list"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Quick Actions</h3>
+                    <button id="exportJsonBtn" class="btn-action" disabled>
+                        <i class="fas fa-file-export"></i> Export JSON
+                    </button>
+                    <button id="exportCsvBtn" class="btn-action" disabled>
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <button id="compareBtn" class="btn-action" disabled>
+                        <i class="fas fa-balance-scale"></i> Compare Images
+                    </button>
+                    <button id="batchProcessBtn" class="btn-action" disabled>
+                        <i class="fas fa-layer-group"></i> Batch Process
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <section class="content-area">
+                <!-- Image Preview -->
+                <div class="preview-section">
+                    <div id="imagePreview" class="image-preview">
+                        <div class="preview-placeholder">
+                            <i class="fas fa-image"></i>
+                            <p>No image selected</p>
+                        </div>
+                    </div>
+                    <div class="preview-controls">
+                        <button id="zoomInBtn" class="btn-control" disabled>
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button id="zoomOutBtn" class="btn-control" disabled>
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="rotateBtn" class="btn-control" disabled>
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                        <button id="fullscreenBtn" class="btn-control" disabled>
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metadata Tabs -->
+                <div class="metadata-section">
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <button class="tab-btn active" data-tab="exif">
+                                <i class="fas fa-camera"></i> EXIF
+                            </button>
+                            <button class="tab-btn" data-tab="iptc">
+                                <i class="fas fa-tags"></i> IPTC
+                            </button>
+                            <button class="tab-btn" data-tab="xmp">
+                                <i class="fas fa-file-code"></i> XMP
+                            </button>
+                            <button class="tab-btn" data-tab="technical">
+                                <i class="fas fa-microchip"></i> Technical
+                            </button>
+                            <button class="tab-btn" data-tab="gps">
+                                <i class="fas fa-map-marker-alt"></i> GPS
+                            </button>
+                            <button class="tab-btn" data-tab="histogram">
+                                <i class="fas fa-chart-bar"></i> Histogram
+                            </button>
+                            <button class="tab-btn" data-tab="color">
+                                <i class="fas fa-palette"></i> Color Analysis
+                            </button>
+                            <button class="tab-btn" data-tab="raw">
+                                <i class="fas fa-database"></i> Raw Data
+                            </button>
+                        </div>
+
+                        <div class="tabs-content">
+                            <div id="exifTab" class="tab-content active">
+                                <div id="exifData" class="metadata-content"></div>
+                            </div>
+                            <div id="iptcTab" class="tab-content">
+                                <div id="iptcData" class="metadata-content"></div>
+                            </div>
+                            <div id="xmpTab" class="tab-content">
+                                <div id="xmpData" class="metadata-content"></div>
+                            </div>
+                            <div id="technicalTab" class="tab-content">
+                                <div id="technicalData" class="metadata-content"></div>
+                            </div>
+                            <div id="gpsTab" class="tab-content">
+                                <div id="gpsData" class="metadata-content">
+                                    <div id="mapContainer" class="map-container"></div>
+                                </div>
+                            </div>
+                            <div id="histogramTab" class="tab-content">
+                                <canvas id="histogramCanvas" class="histogram-canvas"></canvas>
+                            </div>
+                            <div id="colorTab" class="tab-content">
+                                <div id="colorData" class="metadata-content"></div>
+                            </div>
+                            <div id="rawTab" class="tab-content">
+                                <div id="rawData" class="metadata-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="settingsContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="compareModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>Image Comparison</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="compareContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Libraries - Load in correct order -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
